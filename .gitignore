@@ -1,0 +1,4 @@
+output/frames
+venv
+.vscode
+__pycache__
