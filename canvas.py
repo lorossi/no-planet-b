@@ -2,8 +2,9 @@ import cairo
 
 from math import sqrt
 
-from square import Square
 from table import Table
+from square import Square
+from utils import get_month
 
 
 class Canvas():
@@ -129,7 +130,7 @@ class Canvas():
         scl = self._squares[-1].scl
         ext_scl = self._squares[-1].external_scl
         # calculate text size and position
-        tsize = scl * 0.275
+        label_font_size = scl * 0.275
         tx, ty = self._squares[-1].position
 
         # set font
@@ -138,43 +139,78 @@ class Canvas():
             cairo.FONT_WEIGHT_BOLD
         )
         # set text color
-        self._ctx.set_source_rgba(0.06, 0.06, 0.06)
+        self._ctx.set_source_rgba(0.05, 0.05, 0.05)
         # set text size
-        self._ctx.set_font_size(tsize)
+        self._ctx.set_font_size(label_font_size)
 
         # write first line
-        self._ctx.move_to(tx + scl + tsize, ty + tsize * 1.5)
+        self._ctx.move_to(tx + scl + label_font_size,
+                          ty + label_font_size * 1.5)
         self._ctx.show_text("THERE IS NO PLAN B")
         # write second line
-        self._ctx.move_to(tx + scl + tsize,  ty + ext_scl - tsize)
+        self._ctx.move_to(tx + scl + label_font_size,
+                          ty + ext_scl - label_font_size)
         self._ctx.show_text("THERE IS NO PLANET B")
+
+        # draw first year label
+        self._ctx.select_font_face(
+            "Gilroy", cairo.FONT_SLANT_NORMAL,
+            cairo.FONT_WEIGHT_NORMAL
+        )
+        self._ctx.set_source_rgba(0.25, 0.25, 0.25)
+
+        tx, ty = self._squares[0].position
+        label = "from 1880..."
+        self._ctx.move_to(tx, ty - label_font_size * 0.3)
+        self._ctx.show_text(label)
+        # draw last year label
+        tx, ty = self._squares[-1].position
+        label = "...to 2020"
+        self._ctx.move_to(tx - len(label) * 1.5, ty + scl + label_font_size)
+        self._ctx.show_text(label)
 
         # restore position to write title relative to total area
         # and not drawing area
         self._restoreCanvas()
 
         # calculate text size and position
-        tsize = self._title_size * 0.5
+        title_font_size = self._title_size * 0.5
+        subtitle_font_size = title_font_size / 2
         tx = self._width * self._border / 2
-        ty = scl * .85
+        ty = scl * .75
 
         # set font
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL,
             cairo.FONT_WEIGHT_BOLD
         )
-        # set text color
-        self._ctx.set_source_rgba(0.06, 0.06, 0.06)
-        # set font size
-        self._ctx.set_font_size(tsize)
 
+        # set text color
+        self._ctx.set_source_rgba(0.05, 0.05, 0.05)
+
+        self._ctx.select_font_face(
+            "Gilroy", cairo.FONT_SLANT_NORMAL,
+            cairo.FONT_WEIGHT_NORMAL
+        )
+        # get month name
+        month_name = get_month(month)
         # write title
-        self._ctx.move_to(tx + tsize / 4, ty)
-        self._ctx.show_text("temperature anomalies, year by year")
+        self._ctx.set_font_size(title_font_size)
+        self._ctx.move_to(tx + title_font_size / 4, ty)
+        self._ctx.show_text(
+            "temperature anomalies, year by year - "
+            f"{month_name}"
+        )
+
         # write sub title
-        self._ctx.move_to(tx + tsize / 2, ty + tsize * .8)
-        self._ctx.set_font_size(tsize / 2)
-        self._ctx.show_text("1880 - 2021, data by NOAA")
+        self._ctx.move_to(
+            tx + title_font_size / 2,
+            ty + title_font_size * 0.75
+        )
+        self._ctx.set_font_size(subtitle_font_size)
+        self._ctx.show_text(
+            "each square represents a year"
+        )
 
     def save(self, path: str = "output.png") -> None:
         """Save drawing to file

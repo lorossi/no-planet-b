@@ -22,8 +22,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Creates the animation")
     parser.add_argument(
         "-d", "--duration", type=int,
-        help="destination video duration in frames (defaults to 600)",
-        default=600
+        help="destination video duration in frames (defaults to 1080)",
+        default=1080
     )
     parser.add_argument(
         "-s", "--size", type=int,
