@@ -1,7 +1,6 @@
 import csv
 
 from copy import deepcopy
-from datetime import datetime
 
 from utils import rescale
 
@@ -52,7 +51,7 @@ class Table:
             int: Number of loaded years
         """
 
-        current_year = datetime.now().year
+        current_year = 2021
         self._year_data = {}
 
         for row in self._rows:

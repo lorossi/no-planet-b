@@ -32,3 +32,19 @@ def smooth(x: float) -> float:
         return None
 
     return -(cos(pi * x) - 1) / 2
+
+
+def get_month(x: int) -> str:
+    """Get month name from its index in range [0, 11]
+
+    Args:
+        x (int): Month index
+
+    Returns:
+        str: Month name
+    """
+    if x < 0 or x > 11:
+        return None
+
+    return ["january", "february", "march", "april", "may", "june", "july",
+            "august", "september", "october", "november", "december"][x]
