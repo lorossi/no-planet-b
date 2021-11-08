@@ -20,7 +20,7 @@ Currently, the [GOP26](https://en.wikipedia.org/wiki/2021_United_Nations_Climate
 
 The average earth temperature has risen by [almost 1.5 °C in the last 170 years](https://upload.wikimedia.org/wikipedia/commons/d/db/Global_Temperature_And_Forces.svg), [with a peak increase of more than 4 °C in the north pole](https://upload.wikimedia.org/wikipedia/commons/8/88/Change_in_Average_Temperature.svg).
 
-I decided to visualize this increase in a somehow interesting way, to at least try and easy the huge psychological toll that this matter is causing me. It has always helped my, as it makes me understand what is really going on.
+I decided to visualize this increase in a somehow interesting way, to at least try and easy the huge psychological toll that this matter is causing me. It has always helped me, as it makes me understand what is really going on.
 
 ## Code output
 
