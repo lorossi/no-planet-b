@@ -10,18 +10,19 @@ from utils import get_month
 class Canvas():
     """Class handling the drawing"""
 
-    def __init__(self, size: int = 1000, title_size: int = 100,
+    def __init__(self, size: int = 1080, title_size: int = 80,
                  border: float = 0.1) -> None:
         """Creates the drawing canvas.
 
         Args:
             size (int, optional): Size of the drawing area. Defaults to 1000.
-            title_size (int, optional): Height of the title. Defaults to 100.
+            title_size (int, optional): Height of the title. Defaults to 80.
             border (float, optional): Border of the drawing area.
             Defaults to 0.1.
         """
-        self._width = size
         self._height = size + title_size
+        self._width = size + title_size
+
         self._title_size = title_size
         self._border = border
 
@@ -48,7 +49,7 @@ class Canvas():
         self._ctx.set_source_rgb(0.94, 0.94, 0.94)
         self._ctx.fill()
         # scale drawing to accomodate border
-        self._ctx.translate(0, self._title_size)
+        self._ctx.translate(self._title_size / 2, self._title_size)
         self._ctx.translate(self._width / 2, self._height / 2)
         self._ctx.scale(1 - self._border, 1 - self._border)
         self._ctx.translate(- self._width / 2, - self._height / 2)
@@ -64,7 +65,10 @@ class Canvas():
     def createSquares(self) -> None:
         """Creates the squares and saves them into the list."""
         # size of the square
-        scl = min(self._width / self._cols, self._width / self._rows)
+        scl = min(
+            self._width / self._cols,
+            (self._height - self._title_size) / self._rows
+        )
         # first year in the temperature data
         first_year = self._t.first_year
         # last year in the temperature data
@@ -144,12 +148,16 @@ class Canvas():
         self._ctx.set_font_size(label_font_size)
 
         # write first line
-        self._ctx.move_to(tx + scl + label_font_size,
-                          ty + label_font_size * 1.5)
+        self._ctx.move_to(
+            tx + scl + label_font_size,
+            ty + label_font_size * 1.5
+        )
         self._ctx.show_text("THERE IS NO PLAN B")
         # write second line
-        self._ctx.move_to(tx + scl + label_font_size,
-                          ty + ext_scl - label_font_size)
+        self._ctx.move_to(
+            tx + scl + label_font_size,
+            ty + ext_scl - label_font_size
+        )
         self._ctx.show_text("THERE IS NO PLANET B")
 
         # draw first year label
@@ -196,7 +204,10 @@ class Canvas():
         month_name = get_month(month)
         # write title
         self._ctx.set_font_size(title_font_size)
-        self._ctx.move_to(tx + title_font_size / 4, ty)
+        self._ctx.move_to(
+            tx + title_font_size / 4,
+            ty
+        )
         self._ctx.show_text(
             "temperature anomalies, year by year - "
             f"{month_name}"
