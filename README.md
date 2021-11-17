@@ -30,11 +30,11 @@ Each rectangle represents a year in that range. A temperature above the average 
 
 Here below I have included a few screenshots and a choppy gif:
 
-![january](output/0000073.png)
+![february](output/0000100.png)
 
-![april](output/0000289.png)
+![april](output/0000360.png)
 
-![november](output/0000907.png)
+![november](output/0000979.png)
 
 ![gif of the output](output/output.gif)
 
