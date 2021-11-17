@@ -12,19 +12,19 @@ While something is actually moving, like the [Fridays for future movement](https
 
 I'm not trying to push a *communist* or *anti capitalist* agenda, but I firmly believe we are putting aside the most important and least replaceable thing we have *(our planet)* in order to make our economies run faster. We have to act fast, we have to act now.
 
-Currently, the [GOP26](https://en.wikipedia.org/wiki/2021_United_Nations_Climate_Change_Conference) is under way. I have very little faith that something is going to change, but hope on who's above us is the only thing we have left to solve these issues.
-
 ## That's depressing
 
 *But wait, there's more!*
 
-The average earth temperature has risen by [almost 1.5 °C in the last 170 years](https://upload.wikimedia.org/wikipedia/commons/d/db/Global_Temperature_And_Forces.svg), [with a peak increase of more than 4 °C in the north pole](https://upload.wikimedia.org/wikipedia/commons/8/88/Change_in_Average_Temperature.svg).
+The [GOP26](https://en.wikipedia.org/wiki/2021_United_Nations_Climate_Change_Conference), the world leaders conference, the big thing that was meant to save us from utter and complete climatic disaster, [has failed](https://www.dw.com/en/cop26-world-leaders-fail-to-honor-climate-pledge/a-59812348).
+
+Meanwhile, average earth temperature has risen by [almost 1.5 °C in the last 170 years](https://upload.wikimedia.org/wikipedia/commons/d/db/Global_Temperature_And_Forces.svg), [with a peak increase of more than 4 °C in the north pole](https://upload.wikimedia.org/wikipedia/commons/8/88/Change_in_Average_Temperature.svg).
 
 I decided to visualize this increase in a somehow interesting way, to at least try and easy the huge psychological toll that this matter is causing me. It has always helped me, as it makes me understand what is really going on.
 
 ## Code output
 
-I have analyzed the temperature anomalies dataset from [NOAA](https://www.ncdc.noaa.gov) for our whole planet from 1880 to 2020. They define a temperature anomaly as *"[...] a departure from a reference value or long-term average. A positive anomaly indicates that the observed temperature was warmer than the reference value, while a negative anomaly indicates that the observed temperature was cooler than the reference value"*. Basically, if this value is higher than zero, it means that the corresponding year has been hotter than the average.
+I have analysed the temperature anomalies dataset from [NOAA](https://www.ncdc.noaa.gov) for our whole planet from 1880 to 2020. They define a temperature anomaly as *"[...] a departure from a reference value or long-term average. A positive anomaly indicates that the observed temperature was warmer than the reference value, while a negative anomaly indicates that the observed temperature was cooler than the reference value"*. Basically, if this value is higher than zero, it means that the corresponding year has been hotter than the average.
 
 Each rectangle represents a year in that range. A temperature above the average is represented in red, while a temperature below is rendered in blue. The data is interpolated to each day of the month. The output can be seen below, in the repo (inside the `output` folder), or on my [Instagram profile](https://www.instagram.com/lorossi97).
 
