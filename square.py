@@ -1,8 +1,11 @@
+"""File containing the class handling a square. This is not more complicated than a dataclass."""
+
+
 class Square:
     """Class containing a square."""
 
     def __init__(self, x: int, y: int, scl: int) -> None:
-        """Creates the square.
+        """Create the square.
 
         Args:
             x (int): Top left x coordinate of the square
@@ -17,21 +20,37 @@ class Square:
         self._border = 0.1
 
     @property
-    def x(self):
+    def x(self) -> float:
+        """Top left corner x coordinate of the square.
+
+        Returns:
+            float
+        """
         return self._x + self._border / 2 * self._scl
 
     @property
-    def y(self):
+    def y(self) -> float:
+        """Top left corner y coordinate of the square.
+
+        Returns:
+            float
+        """
         return self._y + self._border / 2 * self._scl
 
     @property
-    def position(self):
+    def position(self) -> tuple[float, float]:
+        """Position of the top left corner.
+
+        Returns:
+            tuple[float, float]: x and y coordinates
+        """
         return (self.x, self.y)
 
     @property
-    def scl(self):
-        return self._scl * (1 - self._border)
+    def scl(self) -> float:
+        """Size of the rectangle.
 
-    @property
-    def external_scl(self):
-        return self._scl
+        Returns:
+            float
+        """
+        return self._scl * (1 - self._border)

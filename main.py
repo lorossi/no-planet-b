@@ -1,9 +1,16 @@
+"""File containing all the logic needed to create the animation."""
+
 import argparse
 
 from canvas import Canvas
 
 
 def main(args) -> None:
+    """Render the animation according to the arguments.
+
+    Args:
+        args (args): args as parsed byt the argparse library
+    """
     # create a canvas
     canvas = Canvas(args.size, args.title_size, args.border)
 

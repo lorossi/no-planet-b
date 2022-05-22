@@ -1,7 +1,10 @@
+"""File containing a bunch of functions used in the whole project."""
+
+
 def rescale(
     value: float, old_min: float, old_max: float, new_min: float, new_max: float
 ) -> float:
-    """Map value to a new range
+    """Map value to a new range.
 
     Args:
         value (float): Value to be mapped
@@ -16,7 +19,16 @@ def rescale(
     return (value - old_min) * (new_max - new_min) / (old_max - old_min) + new_min
 
 
-def smooth(x: float, n: float = 2) -> float:
+def poly_smooth(x: float, n: float = 3) -> float:
+    """Polynomial easing of a variable in range [0, 1].
+
+    Args:
+        x (float): variable to be smoothed
+        n (float, optional): polynomial degree. Defaults to 3.
+
+    Returns:
+        float: _description_
+    """
     if x > 1:
         return 1
     if x < 0:
@@ -29,7 +41,7 @@ def smooth(x: float, n: float = 2) -> float:
 
 
 def get_colour(temperature: float) -> tuple[float, float, float, float]:
-    """Get colour from temperature
+    """Get colour from temperature.
 
     Args:
         temperature (float): Temperature in range [-1, 1]
@@ -53,12 +65,22 @@ def get_colour(temperature: float) -> tuple[float, float, float, float]:
 
 
 def interpolate_temperature(current_t: float, next_t: float, percent: float) -> float:
-    smooth_percent = smooth(percent)
+    """Interpolate temperature according to the relative percent.
+
+    Args:
+        current_t (float): current month temperature
+        next_t (float): next month temperature
+        percent (float): current evaluation percent
+
+    Returns:
+        float
+    """
+    smooth_percent = poly_smooth(percent)
     return (1 - smooth_percent) * current_t + smooth_percent * next_t
 
 
 def get_month(x: int) -> str:
-    """Get month name from its index in range [0, 11]
+    """Get month name from its index in range [0, 11].
 
     Args:
         x (int): Month index

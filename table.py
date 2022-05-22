@@ -1,6 +1,7 @@
+"""File handling the data parsing and manipulation."""
+
 import csv
 
-from copy import deepcopy
 from utils import rescale
 from datetime import date
 
@@ -9,7 +10,7 @@ class Table:
     """Class handling the temperature data as in table."""
 
     def __init__(self, path: str) -> None:
-        """Inits the table.
+        """Init the table.
 
         Args:
             path (str): Path to the table
@@ -23,7 +24,7 @@ class Table:
         self._monthly_data = {}
 
     def _loadRows(self, discard_header: bool = True) -> int:
-        """Loads rows from table.
+        """Load rows from table.
 
         Args:
             discard_header (bool, optional): If true, discard headers.
@@ -43,7 +44,7 @@ class Table:
         return len(self._rows)
 
     def _groupByMonth(self, discard_current: bool = True) -> int:
-        """Group temperatures by month for each year
+        """Group temperatures by month for each year.
 
         Args:
             discard_current (bool, optional): Discard current year, as data
@@ -52,7 +53,6 @@ class Table:
         Returns:
             int: Number of loaded years
         """
-
         self._monthly_data = {}
 
         for row in self._rows:
@@ -71,7 +71,7 @@ class Table:
         return len(self._monthly_data)
 
     def _groupByYear(self, discard_current: bool = True) -> int:
-        """Group temperatures by year
+        """Group temperatures by year.
 
         Args:
             discard_current (bool, optional): Discard current year, as data
@@ -80,7 +80,6 @@ class Table:
         Returns:
             int: Number of loaded years
         """
-
         self._yearly_data = {}
 
         for row in self._rows:
@@ -102,7 +101,7 @@ class Table:
         return len(self._yearly_data)
 
     def loadMonths(self) -> int:
-        """Loads the table from file
+        """Load the table from file, differentiating data by month.
 
         Returns:
             int: Number of loaded years
@@ -113,7 +112,7 @@ class Table:
         return 0
 
     def loadYears(self) -> int:
-        """Loads the table from file
+        """Load the table from file, averaging the temperature anomaly of each year.
 
         Returns:
             int: Number of loaded years
@@ -124,7 +123,7 @@ class Table:
         return 0
 
     def normalizeMonthlyTemperature(self) -> int:
-        """Normalized temperature anomalies in range [-1, 1]
+        """Normalize temperature anomalies in range [-1, 1].
 
         Returns:
             int: Number of years
@@ -142,6 +141,11 @@ class Table:
         return len(self._normalized_monthly_data)
 
     def normalizeYearlyTemperature(self) -> int:
+        """Normalize temperature anomalies in range [-1, 1].
+
+        Returns:
+            int: Number of years
+        """
         max_temp = max(self._yearly_data.values())
         min_temp = min(self._yearly_data.values())
 
@@ -155,30 +159,60 @@ class Table:
         return len(self._normalized_yearly_data)
 
     @property
-    def monthly_data(self):
-        return deepcopy(self._monthly_data)
+    def monthly_data(self) -> dict[int, list[float]]:
+        """Return monthly data for each year.
+
+        Returns:
+            dict[int, list[float]]
+        """
+        return self._monthly_data
 
     @property
-    def normalized_monthly_data(self):
-        return deepcopy(self._normalized_monthly_data)
+    def normalized_monthly_data(self) -> dict[int, list[float]]:
+        """Return normalized monthly data for each year.
+
+        Returns:
+            dict[int, list[float]]
+        """
+        return self._normalized_monthly_data
 
     @property
-    def yearly_data(self):
-        return deepcopy(self._yearly_data)
+    def yearly_data(self) -> dict[int, float]:
+        """Return yearly data for each year.
+
+        Returns:
+            dict[int, list[float]]
+        """
+        return self._yearly_data
 
     @property
-    def normalized_yearly_data(self):
-        return deepcopy(self._normalized_yearly_data)
+    def normalized_yearly_data(self) -> dict[int, float]:
+        """Return normalized data for each year.
+
+        Returns:
+            dict[int, float]
+        """
+        return self._normalized_yearly_data
 
     @property
-    def first_year(self):
+    def first_year(self) -> int:
+        """Return first year of data.
+
+        Returns:
+            int
+        """
         if self._monthly_data:
             return min(self._monthly_data.keys())
 
         return min(self._yearly_data.keys())
 
     @property
-    def last_year(self):
+    def last_year(self) -> int:
+        """Return last year of data.
+
+        Returns:
+            int
+        """
         if self._monthly_data:
             return max(self._monthly_data.keys())
 
