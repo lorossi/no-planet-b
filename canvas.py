@@ -32,7 +32,7 @@ class Canvas:
         self._border = border
 
         # load table
-        self._table = Table("dataset/1880-2021.csv")
+        self._table = Table("dataset/1880-2022.csv")
 
         # create canvas
         self._canvas = cairo.ImageSurface(
