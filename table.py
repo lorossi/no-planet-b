@@ -183,15 +183,3 @@ class Table:
             return max(self._monthly_data.keys())
 
         return max(self._yearly_data.keys())
-
-
-def main():
-    t = Table("dataset/1880-2021.csv")
-    t.loadYears()
-    t.normalizeYearlyTemperature()
-    print(t.yearly_data)
-    print(t.normalized_yearly_data)
-
-
-if __name__ == "__main__":
-    main()

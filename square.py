@@ -1,6 +1,3 @@
-from utils import smooth
-
-
 class Square:
     """Class containing a square."""
 
@@ -18,32 +15,6 @@ class Square:
 
         # hard coded, there's no need to toggle this
         self._border = 0.1
-
-    def interpolateTemperature(self, month: int, percent: float) -> float:
-        """Interpolate temperature according to current month
-        and advancement in it.
-
-        Args:
-            month (int): Current month
-            percent (float): Advancement percent
-
-        Returns:
-            float: Interpolated temperature in range [-1, 1]
-        """
-        #! TODO Implement this in utils.py
-        # check that values are in range
-        if month < 0 or month > 11:
-            return None
-        if percent < 0 or percent > 1:
-            return None
-        # compute next month
-        next_month = (month + 1) % 12
-        # extract temperature for current and next month
-        # eventually wrapping around 12
-        temperature = self._temperatures[month]
-        next_temperature = self._temperatures[next_month]
-        # interpolation with smoothing
-        return temperature + (next_temperature - temperature) * smooth(percent)
 
     @property
     def x(self):
