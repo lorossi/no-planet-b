@@ -1,8 +1,8 @@
 import csv
 
 from copy import deepcopy
-
 from utils import rescale
+from datetime import date
 
 
 class Table:
@@ -14,10 +14,13 @@ class Table:
         Args:
             path (str): Path to the table
         """
+        self._current_year = date.today().year
         self._path = path
         self._rows = []
-        self._year_data = {}
-        self._normalized_year_data = {}
+        self._monthly_data = {}
+        self._normalized_monthly_data = {}
+        self._yearly_data = {}
+        self._monthly_data = {}
 
     def _loadRows(self, discard_header: bool = True) -> int:
         """Loads rows from table.
@@ -29,7 +32,6 @@ class Table:
         Returns:
             int: Number of loaded rows
         """
-        # sourcery skip: assign-if-exp
         with open(self._path, "r") as f:
             reader = csv.reader(f)
 
@@ -39,6 +41,34 @@ class Table:
                 self._rows = list(reader)
 
         return len(self._rows)
+
+    def _groupByMonth(self, discard_current: bool = True) -> int:
+        """Group temperatures by month for each year
+
+        Args:
+            discard_current (bool, optional): Discard current year, as data
+            might be incomplete. Defaults to True.
+
+        Returns:
+            int: Number of loaded years
+        """
+
+        self._monthly_data = {}
+
+        for row in self._rows:
+            year = int(row[0][:-2])
+
+            if discard_current and year == self._current_year:
+                continue
+
+            temperature = float(row[1])
+
+            if year not in self._monthly_data:
+                self._monthly_data[year] = []
+
+            self._monthly_data[year].append(temperature)
+
+        return len(self._monthly_data)
 
     def _groupByYear(self, discard_current: bool = True) -> int:
         """Group temperatures by year
@@ -51,25 +81,38 @@ class Table:
             int: Number of loaded years
         """
 
-        current_year = 2021
-        self._year_data = {}
+        self._yearly_data = {}
 
         for row in self._rows:
             year = int(row[0][:-2])
 
-            if discard_current and year == current_year:
+            if discard_current and year == self._current_year:
                 continue
 
             temperature = float(row[1])
 
-            if year not in self._year_data:
-                self._year_data[year] = []
+            if year not in self._yearly_data:
+                self._yearly_data[year] = 0
 
-            self._year_data[year].append(temperature)
+            self._yearly_data[year] += temperature
 
-        return len(self._year_data)
+        for year in self._yearly_data:
+            self._yearly_data[year] /= 12
 
-    def load(self) -> int:
+        return len(self._yearly_data)
+
+    def loadMonths(self) -> int:
+        """Loads the table from file
+
+        Returns:
+            int: Number of loaded years
+        """
+        if self._loadRows() > 0:
+            return self._groupByMonth()
+
+        return 0
+
+    def loadYears(self) -> int:
         """Loads the table from file
 
         Returns:
@@ -80,7 +123,7 @@ class Table:
 
         return 0
 
-    def normalizeTemperature(self) -> int:
+    def normalizeMonthlyTemperature(self) -> int:
         """Normalized temperature anomalies in range [-1, 1]
 
         Returns:
@@ -89,27 +132,66 @@ class Table:
         max_temp = max(float(r[1]) for r in self._rows)
         min_temp = min(float(r[1]) for r in self._rows)
 
-        self._normalized_year_data = {}
+        self._normalized_monthly_data = {}
 
-        for year, temperatures in self._year_data.items():
-            self._normalized_year_data[year] = [
+        for year, temperatures in self._monthly_data.items():
+            self._normalized_monthly_data[year] = [
                 rescale(t, min_temp, max_temp, -1, 1) for t in temperatures
             ]
 
-        return len(self._normalized_year_data)
+        return len(self._normalized_monthly_data)
+
+    def normalizeYearlyTemperature(self) -> int:
+        max_temp = max(self._yearly_data.values())
+        min_temp = min(self._yearly_data.values())
+
+        self._normalized_yearly_data = {}
+
+        for year, temperature in self._yearly_data.items():
+            self._normalized_yearly_data[year] = rescale(
+                temperature, min_temp, max_temp, -1, 1
+            )
+
+        return len(self._normalized_yearly_data)
 
     @property
-    def year_data(self):
-        return deepcopy(self._year_data)
+    def monthly_data(self):
+        return deepcopy(self._monthly_data)
 
     @property
-    def normalized_year_data(self):
-        return deepcopy(self._normalized_year_data)
+    def normalized_monthly_data(self):
+        return deepcopy(self._normalized_monthly_data)
+
+    @property
+    def yearly_data(self):
+        return deepcopy(self._yearly_data)
+
+    @property
+    def normalized_yearly_data(self):
+        return deepcopy(self._normalized_yearly_data)
 
     @property
     def first_year(self):
-        return min(self._year_data)
+        if self._monthly_data:
+            return min(self._monthly_data.keys())
+
+        return min(self._yearly_data.keys())
 
     @property
     def last_year(self):
-        return max(self._year_data)
+        if self._monthly_data:
+            return max(self._monthly_data.keys())
+
+        return max(self._yearly_data.keys())
+
+
+def main():
+    t = Table("dataset/1880-2021.csv")
+    t.loadYears()
+    t.normalizeYearlyTemperature()
+    print(t.yearly_data)
+    print(t.normalized_yearly_data)
+
+
+if __name__ == "__main__":
+    main()
