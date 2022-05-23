@@ -67,7 +67,7 @@ class Canvas:
         """Clear and scales the drawing area."""
         # clears background
         self._ctx.rectangle(0, 0, self._width, self._height)
-        self._ctx.set_source_rgb(0.94, 0.94, 0.94)
+        self._ctx.set_source_rgb(0.96, 0.96, 0.96)
         self._ctx.fill()
         # scale drawing to accomodate border
         self._ctx.translate(self._title_size / 2, self._title_size)
