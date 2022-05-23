@@ -28,13 +28,9 @@ I have analysed the temperature anomalies dataset from [NOAA](https://www.ncdc.n
 
 Each rectangle represents a year in that range. A temperature above the average is represented in red, while a temperature below is rendered in blue. The data is interpolated to each day of the month. The output can be seen below, in the repo (inside the `output` folder), or on my [Instagram profile](https://www.instagram.com/lorossi97).
 
-Here below I have included a few screenshots and a choppy gif:
+Here below I have included a screenshots and a choppy gif:
 
-![february](output/0000100.png)
-
-![april](output/0000360.png)
-
-![november](output/0000979.png)
+![all](output/all.png)
 
 ![gif of the output](output/output.gif)
 
@@ -42,10 +38,11 @@ Here below I have included a few screenshots and a choppy gif:
 
 |      *command*       |                 *description*                  | *type*  | *default* |
 | :------------------: | :--------------------------------------------: | :-----: | :-------: |
-|  `-d`, `--duration`  |  set the duration of the animation in frames   |  `int`  |  `1080`   |
+|  `-d`, `--duration`  |  set the duration of the animation in frames   |  `int`  |   `600`   |
 |    `-s`, `--size`    |     size of the animation frame in pixels      |  `int`  |  `1000`   |
 | `-t`, `--title-size` |       size of the title frame in pixels        |  `int`  |   `80`    |
 |   `-b`, `--border`   |      percent of the canvas used as border      | `float` |   `0.1`   |
+|   `-S`, `--single`   |   generate only a frame, overriding duration   | `bool`  |  `false`  |
 |      `--debug`       | if set, renders only the first frame and quits | `bool`  |  `false`  |
 
 The generated frames were then stitched together with `FFMPEG`.
@@ -64,6 +61,6 @@ Not ~~happy~~ *depressed* enough, I decided to make one more step and rendere a 
 
 This project is distributed under Attribution 4.0 International (CC BY 4.0) license.
 
-Monthly temperature anomalies data by [NOAA](https://www.ncdc.noaa.gov/monitoring-references/faq/anomalies.php#anomalies)
+Monthly temperature anomalies data by [NOAA](https://www.ncei.noaa.gov/access/monitoring/global-temperature-anomalies/anomalies)
 
 `clear && rm output/frames/*.png && python3 main.py && cd output/ && makevideo && cd .. && clear && echo -e "All done! \a"`
