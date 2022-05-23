@@ -77,31 +77,3 @@ def interpolate_temperature(current_t: float, next_t: float, percent: float) -> 
     """
     smooth_percent = poly_smooth(percent)
     return (1 - smooth_percent) * current_t + smooth_percent * next_t
-
-
-def get_month(x: int) -> str:
-    """Get month name from its index in range [0, 11].
-
-    Args:
-        x (int): Month index
-
-    Returns:
-        str: Month name
-    """
-    if x < 0 or x > 11:
-        return None
-
-    return [
-        "january",
-        "february",
-        "march",
-        "april",
-        "may",
-        "june",
-        "july",
-        "august",
-        "september",
-        "october",
-        "november",
-        "december",
-    ][x]

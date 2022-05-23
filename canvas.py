@@ -1,11 +1,12 @@
 """This file contains the class handling the canvas (single frame) creation."""
 
+from turtle import title
 import cairo
 
 from math import sqrt
 from table import Table
 from square import Square
-from utils import get_month, get_colour, interpolate_temperature
+from utils import get_colour, interpolate_temperature
 
 
 class Canvas:
@@ -31,6 +32,9 @@ class Canvas:
         self._title_size = title_size
         self._border = border
 
+        self._title_font_size = self._title_size * 0.3
+        self._subtitle_font_size = self._title_size * 0.2
+
         # load table
         self._table = Table("dataset/1880-2022.csv")
 
@@ -42,19 +46,22 @@ class Canvas:
         self._ctx = cairo.Context(self._canvas)
 
     def _createLabels(self) -> None:
+        """Create labels for all the texts in the frames."""
         self._labels = [
             "THERE IS NO PLAN B",
             "THERE IS NO PLANET B",
+            "ACT NOW!",
             f"from {self._table.first_year}...",
             f"...to {self._table.last_year}",
         ]
 
-    def _createTitle(self, current_month: str = None) -> None:
-        self._title = "temperature anomalies, year by year"
-        if current_month:
-            self._title += " - " f"{current_month}"
-
-        self._subtitle = "each square represents a year"
+    def _createTitle(self) -> None:
+        """Create a title, either for the current month or for the whole dataset."""
+        self._title = "average temperature, year by year"
+        self._subtitle = [
+            "a blue square represents a colder year than the average",
+            "a red square represents a hotter year",
+        ]
 
     def _clearCanvas(self) -> None:
         """Clear and scales the drawing area."""
@@ -83,7 +90,7 @@ class Canvas:
         self._table.normalizeMonthlyTemperature()
 
     def loadYears(self) -> None:
-        """Load dta for each year from the table."""
+        """Load data for each year from the table."""
         self._years_loaded = True
         self._years_count = self._table.loadYears()
         self._table.normalizeYearlyTemperature()
@@ -135,6 +142,11 @@ class Canvas:
             )
 
     def _drawFrame(self, percent: float) -> None:
+        """Draw a frame from the whole animation.
+
+        Args:
+            percent (float)
+        """
         # calculate advancement in current month and
         # wrap in [0, 1) range
         month_percent = percent * 12
@@ -163,6 +175,7 @@ class Canvas:
             self._ctx.fill()
 
     def _drawSingleFrame(self) -> None:
+        """Draw a single frame, composing the output."""
         # load all temperature data
         temperatures = self._table.normalized_yearly_data
         first_year = self._table.first_year
@@ -176,78 +189,81 @@ class Canvas:
             self._ctx.fill()
 
     def _drawLabels(self) -> None:
-        # get size of the last rectangle
-        scl = self._squares[-1].scl
-
-        # calculate text size and position
-        label_font_size = scl * 0.2
-        tx, ty = self._squares[-1].position
+        """Draw all the labels in the frame."""
+        # calculate text position
+        tx = self._squares[-1].x + self._squares[-1].scl * 1.1
+        ty = self._squares[-1].y
 
         # set font
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
         # set text colour
-        self._ctx.set_source_rgba(0.05, 0.05, 0.05)
+        self._ctx.set_source_rgba(0, 0, 0)
         # set text size
-        self._ctx.set_font_size(label_font_size)
+        self._ctx.set_font_size(self._subtitle_font_size)
 
-        # write first line
-        self._ctx.move_to(tx + scl + label_font_size, ty + label_font_size * 1.5)
-        self._ctx.show_text(self._labels[0])
-        # write second line
-        self._ctx.move_to(tx + scl + label_font_size, ty + label_font_size * 3)
-        self._ctx.show_text(self._labels[1])
+        # getline height
+        text_height = self._ctx.text_extents(self._labels[0]).height
+
+        # write text lines at the end
+        for i, line in enumerate(self._labels[:3]):
+            self._ctx.move_to(tx, ty + text_height * (i + 1) * 1.5)
+            self._ctx.show_text(line)
 
         # draw first year label
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL
         )
-        self._ctx.set_source_rgba(0.25, 0.25, 0.25)
+        self._ctx.set_source_rgba(0, 0, 0)
 
         # draw first year label
+        scl = self._squares[-1].scl
         tx, ty = self._squares[0].position
-        height = self._ctx.text_extents(self._labels[2]).height
+        height = self._ctx.text_extents(self._labels[4]).height
         self._ctx.move_to(tx, ty - height)
-        self._ctx.show_text(self._labels[2])
+        self._ctx.show_text(self._labels[3])
 
         # draw last year label
         tx, ty = self._squares[-1].position
-        label = self._labels[3]
-        width = self._ctx.text_extents(label).width
-        self._ctx.move_to(tx + scl - width, ty + scl + label_font_size)
-        self._ctx.show_text(self._labels[3])
+        width = self._ctx.text_extents(self._labels[4]).width
+        self._ctx.move_to(tx + scl - width, ty + scl + self._subtitle_font_size * 1.3)
+        self._ctx.show_text(self._labels[4])
 
     def _drawTitle(self) -> None:
+        """Draw the title and the subtitle of the frame."""
         # get size of the last rectangle
         scl = self._squares[-1].scl
 
-        # calculate text size and position
-        title_font_size = self._title_size * 0.45
-        subtitle_font_size = title_font_size / 2
+        # calculate text position
         tx = self._width * self._border / 2
         ty = scl * 0.75
-
-        # set font
-        self._ctx.select_font_face(
-            "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
-        )
 
         # set text colour
         self._ctx.set_source_rgba(0.05, 0.05, 0.05)
         self._ctx.select_font_face(
-            "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL
+            "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
 
         # write title
-        self._ctx.set_font_size(title_font_size)
-        self._ctx.move_to(tx + title_font_size / 4, ty)
+        title_height = self._ctx.text_extents(self._title).height
+        self._ctx.set_font_size(self._title_font_size)
+        self._ctx.move_to(tx + self._title_font_size / 4, ty)
         self._ctx.show_text(self._title)
 
+        self._ctx.select_font_face(
+            "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL
+        )
         # write sub title
-        self._ctx.move_to(tx + title_font_size / 2, ty + title_font_size * 0.75)
-        self._ctx.set_font_size(subtitle_font_size)
-        self._ctx.show_text(self._subtitle)
+        subtitle_height = self._ctx.text_extents(self._subtitle[0]).height
+        self._ctx.set_font_size(self._subtitle_font_size)
+
+        for i, s in enumerate(self._subtitle):
+            self._ctx.move_to(
+                tx + self._title_font_size / 2,
+                ty + subtitle_height * (i * 0.8) + title_height * 2.1,
+            )
+            self._ctx.show_text(s)
 
     def draw(self, frame: int = 0, duration: int = 0) -> None:
         """
@@ -281,13 +297,8 @@ class Canvas:
         # and not drawing area
         self._restoreCanvas()
 
-        # draw title and subtitle
-        month_name = None
-        if self._months_loaded:
-            percent = int(frame / duration * 12)
-            month_name = get_month(percent)
-
-        self._createTitle(month_name)
+        # draw title
+        self._createTitle()
         self._drawTitle()
 
     def save(self, path: str = "output.png") -> None:

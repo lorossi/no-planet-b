@@ -5,49 +5,19 @@ import argparse
 from canvas import Canvas
 
 
-def main(args) -> None:
-    """Render the animation according to the arguments.
+def parse_args() -> argparse.Namespace:
+    """Parse arguments from the command line.
 
-    Args:
-        args (args): args as parsed byt the argparse library
+    Returns:
+        argparse.Namespace
     """
-    # create a canvas
-    canvas = Canvas(args.size, args.title_size, args.border)
-
-    # load data according to the args
-    if args.static:
-        canvas.loadYears()
-    else:
-        canvas.loadMonths()
-
-    # init the squares
-    canvas.createSquares()
-
-    if args.static:
-        filename = "output/all.png"
-        print("Generating one frame")
-        canvas.draw()
-        canvas.save(filename)
-    else:
-        # draw each frame separately
-        for frame in range(args.duration):
-            filename = f"output/frames/{str(frame).zfill(7)}.png"
-            print(f"Generating frame {frame + 1}/{args.duration}")
-            canvas.draw(frame, args.duration)
-            canvas.save(filename)
-
-            if args.debug:
-                break
-
-
-if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Creates the animation")
     parser.add_argument(
         "-d",
         "--duration",
         type=int,
-        help="destination video duration in frames (defaults to 1080)",
-        default=1080,
+        help="destination video duration in frames (defaults to 600)",
+        default=600,
     )
     parser.add_argument(
         "-s",
@@ -81,5 +51,40 @@ if __name__ == "__main__":
         "--debug", help="debug by saving the first frame only", action="store_true"
     )
 
-    args = parser.parse_args()
-    main(args)
+    return parser.parse_args()
+
+
+def main() -> None:
+    """Render the animation according to the arguments."""
+    args = parse_args()
+    # create a canvas
+    canvas = Canvas(args.size, args.title_size, args.border)
+
+    # load data according to the args
+    if args.static:
+        canvas.loadYears()
+    else:
+        canvas.loadMonths()
+
+    # init the squares
+    canvas.createSquares()
+
+    if args.static:
+        filename = "output/all.png"
+        print("Generating one frame")
+        canvas.draw()
+        canvas.save(filename)
+    else:
+        # draw each frame separately
+        for frame in range(args.duration):
+            filename = f"output/frames/{str(frame).zfill(7)}.png"
+            print(f"Generating frame {frame + 1}/{args.duration}")
+            canvas.draw(frame, args.duration)
+            canvas.save(filename)
+
+            if args.debug:
+                break
+
+
+if __name__ == "__main__":
+    main()
