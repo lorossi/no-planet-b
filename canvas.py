@@ -59,8 +59,8 @@ class Canvas:
         """Create a title, either for the current month or for the whole dataset."""
         self._title = "average temperature, year by year"
         self._subtitle = [
-            "a blue square represents a colder year than the average",
-            "a red square represents a hotter year",
+            "red square = hot year, blue square = cold year",
+            "the variation is evaluated with respect to the mean of all years",
         ]
 
     def _clearCanvas(self) -> None:
