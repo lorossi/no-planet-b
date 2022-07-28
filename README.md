@@ -26,7 +26,7 @@ I decided to visualize this increase in a somehow interesting way, to at least t
 
 I have analysed the temperature anomalies dataset from [NOAA](https://www.ncdc.noaa.gov) for our whole planet from 1880 to 2020. They define a temperature anomaly as *"[...] a departure from a reference value or long-term average. A positive anomaly indicates that the observed temperature was warmer than the reference value, while a negative anomaly indicates that the observed temperature was cooler than the reference value"*. Basically, if this value is higher than zero, it means that the corresponding year has been hotter than the average.
 
-Each rectangle represents a year in that range. A temperature above the average is represented in red, while a temperature below is rendered in blue. The data is interpolated to each day of the month. The output can be seen below, in the repo (inside the `output` folder), or on my [Instagram profile](https://www.instagram.com/lorossi97).
+Each square represents a year in that range. A temperature above the average is represented in red, while a temperature below is rendered in blue. The data is interpolated to each day of the month. The output can be seen below, in the repo (inside the `output` folder), or on my [Instagram profile](https://www.instagram.com/lorossi97).
 
 Here below I have included a screenshots and a choppy gif:
 
