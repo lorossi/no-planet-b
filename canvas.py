@@ -38,7 +38,7 @@ class Canvas:
 
         self._title_font_size = self._title_size * 0.35
         self._subtitle_font_size = self._title_size * 0.2
-        self._text_font_size = self._title_size * 0.15
+        self._text_font_size = self._title_size * 0.13
 
         # load table
         self._table = Table("dataset/1880-2022.csv")
@@ -214,11 +214,12 @@ class Canvas:
             dy = (s.scl + th) / 2
 
             # calculate text color
-            white_threshold = 0.5
+            white_threshold = 0.2
+            ch_span = 0.1
             if abs(s.temperature) > white_threshold:
-                ch = 0.9
+                ch = rescale(abs(s.temperature), white_threshold, 1, 1 - ch_span, 1)
             else:
-                ch = 0.1
+                ch = rescale(abs(s.temperature), 0, white_threshold, 0, ch_span)
 
             # draw the square
             self._ctx.set_source_rgba(*color)
@@ -275,9 +276,7 @@ class Canvas:
     def _drawTitle(self) -> None:
         """Draw the title and the subtitle of the frame."""
         self._title = "average Earth temperature, year by year"
-        self._subtitle = (
-            "the anomalies are evaluated with respect to the mean of all records"
-        )
+        self._subtitle = "the temperature anomalies are evaluated with respect to the mean of all records"
 
         # get size of the last square
         scl = self._squares[-1].scl
