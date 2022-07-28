@@ -1,19 +1,19 @@
 """This file contains the class handling the canvas (single frame) creation."""
 
-from turtle import title
 import cairo
 
 from math import sqrt
+
 from table import Table
 from square import Square
-from utils import get_colour, interpolate_temperature
+from utils import get_color, interpolate_temperature, rescale
 
 
 class Canvas:
     """Class handling the drawing."""
 
     def __init__(
-        self, size: int = 1080, title_size: int = 80, border: float = 0.1
+        self, size: int = 1080, title_size: int = 100, border: float = 0.1
     ) -> None:
         """Create the drawing canvas.
 
@@ -32,8 +32,13 @@ class Canvas:
         self._title_size = title_size
         self._border = border
 
-        self._title_font_size = self._title_size * 0.3
+        self._background_color = (0.96, 0.96, 0.96)
+        self._text_color = (0.2, 0.2, 0.2)
+        self._title_color = (0.05, 0.05, 0.05)
+
+        self._title_font_size = self._title_size * 0.35
         self._subtitle_font_size = self._title_size * 0.2
+        self._text_font_size = self._title_size * 0.15
 
         # load table
         self._table = Table("dataset/1880-2022.csv")
@@ -55,19 +60,11 @@ class Canvas:
             f"...to {self._table.last_year}",
         ]
 
-    def _createTitle(self) -> None:
-        """Create a title, either for the current month or for the whole dataset."""
-        self._title = "average temperature, year by year"
-        self._subtitle = [
-            "red square = hot year, blue square = cold year",
-            "the variation is evaluated with respect to the mean of all years",
-        ]
-
     def _clearCanvas(self) -> None:
         """Clear and scales the drawing area."""
         # clears background
         self._ctx.rectangle(0, 0, self._width, self._height)
-        self._ctx.set_source_rgb(0.96, 0.96, 0.96)
+        self._ctx.set_source_rgb(*self._background_color)
         self._ctx.fill()
         # scale drawing to accomodate border
         self._ctx.translate(self._title_size / 2, self._title_size)
@@ -132,14 +129,25 @@ class Canvas:
 
             # extract temperature data
 
-            # append the square to the list of squares
-            self._squares.append(
-                Square(
-                    x * scl,
-                    y * scl,
-                    scl,
+            if self._table.normalized_yearly_data:
+                # append the square to the list of squares
+                self._squares.append(
+                    Square(
+                        x * scl,
+                        y * scl,
+                        scl,
+                        self._table.normalized_yearly_data[current_year],
+                    )
                 )
-            )
+            else:
+                # terribly hacked together
+                self._squares.append(
+                    Square(
+                        x * scl,
+                        y * scl,
+                        scl,
+                    )
+                )
 
     def _drawFrame(self, percent: float) -> None:
         """Draw a frame from the whole animation.
@@ -167,10 +175,10 @@ class Canvas:
             interpolated = interpolate_temperature(
                 current_temperature, next_temperature, month_percent
             )
-            # get the colour relative to the interpolated temperature
-            colour = get_colour(interpolated)
+            # get the color relative to the interpolated temperature
+            color = get_color(interpolated)
             # draw the square
-            self._ctx.set_source_rgba(*colour)
+            self._ctx.set_source_rgba(*color)
             self._ctx.rectangle(s.x, s.y, s.scl, s.scl)
             self._ctx.fill()
 
@@ -179,14 +187,48 @@ class Canvas:
         # load all temperature data
         temperatures = self._table.normalized_yearly_data
         first_year = self._table.first_year
+
+        # preload font settings
+        self._ctx.select_font_face(
+            "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
+        )
+
+        self._ctx.set_font_size(self._text_font_size)
+        self._ctx.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+
         # draw squares
-        for x, s in enumerate(self._squares):
-            # get the colour relative to the interpolated temperature
-            colour = get_colour(temperatures[first_year + x])
+        for x, s in enumerate(
+            self._squares,
+        ):
+            # get the color relative to the interpolated temperature
+            color = get_color(temperatures[first_year + x])
+
+            # create the text
+            prefix = "+" if s.temperature > 0 else ""
+            temperature = f"{prefix}{s.temperature:.2f} °C"
+
+            # calculate text sizes
+            tw = self._ctx.text_extents(temperature).width
+            th = self._ctx.text_extents(temperature).height
+            dx = (s.scl - tw) / 2
+            dy = (s.scl + th) / 2
+
+            # calculate text color
+            white_threshold = 0.5
+            if abs(s.temperature) > white_threshold:
+                ch = 0.9
+            else:
+                ch = 0.1
+
             # draw the square
-            self._ctx.set_source_rgba(*colour)
+            self._ctx.set_source_rgba(*color)
             self._ctx.rectangle(s.x, s.y, s.scl, s.scl)
             self._ctx.fill()
+
+            # draw the text
+            self._ctx.set_source_rgba(ch, ch, ch, 1)
+            self._ctx.move_to(s.x + dx, s.y + dy)
+            self._ctx.show_text(temperature)
 
     def _drawLabels(self) -> None:
         """Draw all the labels in the frame."""
@@ -198,8 +240,8 @@ class Canvas:
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
-        # set text colour
-        self._ctx.set_source_rgba(0, 0, 0)
+        # set text color
+        self._ctx.set_source_rgb(*self._text_color)
         # set text size
         self._ctx.set_font_size(self._subtitle_font_size)
 
@@ -215,7 +257,7 @@ class Canvas:
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL
         )
-        self._ctx.set_source_rgba(0, 0, 0)
+        self._ctx.set_source_rgb(*self._text_color)
 
         # draw first year label
         scl = self._squares[-1].scl
@@ -232,21 +274,25 @@ class Canvas:
 
     def _drawTitle(self) -> None:
         """Draw the title and the subtitle of the frame."""
-        # get size of the last rectangle
+        self._title = "average Earth temperature, year by year"
+        self._subtitle = (
+            "the anomalies are evaluated with respect to the mean of all records"
+        )
+
+        # get size of the last square
         scl = self._squares[-1].scl
 
         # calculate text position
         tx = self._width * self._border / 2
         ty = scl * 0.75
 
-        # set text colour
-        self._ctx.set_source_rgba(0.05, 0.05, 0.05)
+        # set text color
+        self._ctx.set_source_rgba(*self._title_color)
         self._ctx.select_font_face(
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
 
         # write title
-        title_height = self._ctx.text_extents(self._title).height
         self._ctx.set_font_size(self._title_font_size)
         self._ctx.move_to(tx + self._title_font_size / 4, ty)
         self._ctx.show_text(self._title)
@@ -255,15 +301,14 @@ class Canvas:
             "Gilroy", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL
         )
         # write sub title
-        subtitle_height = self._ctx.text_extents(self._subtitle[0]).height
+        subtitle_height = self._ctx.text_extents(self._subtitle).height
         self._ctx.set_font_size(self._subtitle_font_size)
 
-        for i, s in enumerate(self._subtitle):
-            self._ctx.move_to(
-                tx + self._title_font_size / 2,
-                ty + subtitle_height * (i * 0.8) + title_height * 2.1,
-            )
-            self._ctx.show_text(s)
+        self._ctx.move_to(
+            tx + self._title_font_size / 2,
+            ty + subtitle_height + self._subtitle_font_size * 0.25,
+        )
+        self._ctx.show_text(self._subtitle)
 
     def draw(self, frame: int = 0, duration: int = 0) -> None:
         """
@@ -275,6 +320,7 @@ class Canvas:
         Args:
             frame (int, optional): current frame being rendered. Defaults to 0.
             duration (int, optional): duration of the whole animation. Defaults to 0.
+            write_temperatures (bool, optional): whether to write the temperatures. Defaults to False.
         """
         # save and clear the canvas
         self._saveCanvas()
@@ -298,7 +344,6 @@ class Canvas:
         self._restoreCanvas()
 
         # draw title
-        self._createTitle()
         self._drawTitle()
 
     def save(self, path: str = "output.png") -> None:
