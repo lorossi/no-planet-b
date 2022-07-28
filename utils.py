@@ -40,8 +40,8 @@ def poly_smooth(x: float, n: float = 3) -> float:
     return 1 - pow(-2 * x + 2, n) / 2
 
 
-def get_colour(temperature: float) -> tuple[float, float, float, float]:
-    """Get colour from temperature.
+def get_color(temperature: float) -> tuple[float, float, float, float]:
+    """Get color from temperature.
 
     Args:
         temperature (float): Temperature in range [-1, 1]
@@ -49,17 +49,17 @@ def get_colour(temperature: float) -> tuple[float, float, float, float]:
         tuple: RGBA tuple
     """
     # blending constant
-    colour_blend = 0.85
+    color_blend = 0.85
     alpha_blend = 0.9
 
-    # if temperature < 0, the colour is blue
+    # if temperature < 0, the color is blue
     if temperature < 0:
-        channel = -temperature * colour_blend + (1 - colour_blend)
+        channel = -temperature * color_blend + (1 - color_blend)
         alpha = -temperature * alpha_blend + (1 - alpha_blend)
         return (0, 0, channel, alpha)
 
-    # otherwise, the colour is red
-    channel = temperature * colour_blend + (1 - colour_blend)
+    # otherwise, the color is red
+    channel = temperature * color_blend + (1 - color_blend)
     alpha = temperature * alpha_blend + (1 - alpha_blend)
     return (channel, 0, 0, alpha)
 

@@ -20,6 +20,7 @@ class Table:
         self._rows = []
         self._monthly_data = {}
         self._normalized_monthly_data = {}
+        self._normalized_yearly_data = {}
         self._yearly_data = {}
         self._monthly_data = {}
 
@@ -131,8 +132,6 @@ class Table:
         max_temp = max(float(r[1]) for r in self._rows)
         min_temp = min(float(r[1]) for r in self._rows)
 
-        self._normalized_monthly_data = {}
-
         for year, temperatures in self._monthly_data.items():
             self._normalized_monthly_data[year] = [
                 rescale(t, min_temp, max_temp, -1, 1) for t in temperatures
@@ -148,8 +147,6 @@ class Table:
         """
         max_temp = max(self._yearly_data.values())
         min_temp = min(self._yearly_data.values())
-
-        self._normalized_yearly_data = {}
 
         for year, temperature in self._yearly_data.items():
             self._normalized_yearly_data[year] = rescale(
